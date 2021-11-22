@@ -42,7 +42,7 @@ def proceso_gen_paquetes(N,W,lambdda,nodos):
 
 #INICIALIZACIÓN DE VARIABLES CORRESPONDIENTES AL CASO
 def inicializacion(N,W,lambdda):
-    T = sigma*W + DIFS + 3*SIFS + durRTS + durACK + durDATA
+    T = sigma*W + DIFS + 3*SIFS + durRTS + durCTS + durACK + durDATA
     Tc = (2+sleep)*T
     nodos = [[0 for i in range(N)] for j in range(H)]
     pprint(nodos)
