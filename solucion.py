@@ -41,22 +41,63 @@ def proceso_gen_paquetes(N,W,lambdda,nodos):
     #NUEVO ARRIBO
     return nuevot
 
+def proceso_transmision(nodos, W, N):
+    # Grados del mayor al menor
+    for grado in range(H,0,-1):
+        nodos_contadores = [0 for i in range(N)]
+        for nodo in range(N):
+            # Asignar un contador a aquellos nodos con paquetes
+            if nodos[grado-1][nodo-1] != 0:
+                nodos_contadores[nodo-1] = random.randint(0,W-1)
+            else:
+                # Le asigno W porque no puedo usar min() con None
+                nodos_contadores[nodo-1] = W
+            
+        # Determinar el nodo ganador o si es que no hay, poner -1
+        minimo = min(nodos_contadores);
+        menor_ranura = minimo if minimo < W else -1
+        
+        print(f'\n Contadores nodos grado {grado}')
+        pprint(nodos_contadores)
+        
+        print(f'Menor ranura: {menor_ranura}')
+        
+        # Si hay paquetes por transmitir
+        if menor_ranura > -1:
+            # Checar colisión (contadores repetidos)
+            nodos_ganadores = [i for i, x in enumerate(nodos_contadores) if x == menor_ranura]
+            
+            # Remover paquetes en caso de colisión
+            if len(nodos_ganadores) > 1:
+                for n in nodos_ganadores:
+                    nodos[grado-1][n] -= 1
+                # Aumentar paquetes descartados
+                paquetes_descartados[grado-1] += len(nodos_ganadores)
+            else:
+                # Restar al buffer del nodo
+                nodos[grado-1][nodos_ganadores[0]] -= 1
+            
 
 #INICIALIZACIÓN DE VARIABLES CORRESPONDIENTES AL CASO
 def inicializacion(N,W,lambdda):
     T = sigma*W + DIFS + 3*SIFS + durRTS + durCTS + durACK + durDATA
-    Tc = (2+sleep)*T
+    ranuras_totales = (2+sleep);
+    Tc = ranuras_totales*T
     nodos = [[0 for i in range(N)] for j in range(H)]
     pprint(nodos)
     ta = -1
     tsim = 0
-    for t1 in range(0,int(5000*Tc)): # n*Tc para obtener la cantidad de ciclos por procesar.
+    for t1 in range(1, 5000*ranuras_totales):
         if ta < tsim:
             ta = tsim + proceso_gen_paquetes(N,W,lambdda,nodos)
             pprint(nodos)
         # incremento de tiempo de simulación
         tsim = tsim + T
-
+        
+        # Comprobar que se encuentre en Tx
+        if t1 % ranuras_totales == 1:
+            proceso_transmision(nodos, W, N)
+            
 
 for caso_nodos in nodos_por_grado:
     for caso_W in windows_size:
