@@ -13,6 +13,7 @@ durDATA = 43e-3
 sigma = 1e-3 #tamaño de miniranuras
 H = 7 #grados
 paquetes_descartados = [0 for h in range(1,H)] #paquetes descartados por grado
+paquetes_generados = [0 for h in range(1,H)] #paquetes generados por grado
 K = 15 #tamaño del buffer
 sleep = 18 #número de ranuras dormir
 #nodos_por_grado = [5,10,15,20]
@@ -36,6 +37,7 @@ def proceso_gen_paquetes(N,W,lambdda,nodos):
         nodos[grado-1][nodo-1] += 1
     else:
         paquetes_descartados[grado-1] += 1
+    paquetes_generados[grado-1] += 1
     #NUEVO ARRIBO
     return nuevot
 
