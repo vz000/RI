@@ -29,7 +29,7 @@ def proceso_gen_paquetes(N,W,lambdda,nodos):
     nuevot = -(1/lambda2)*math.log(1-U)
     print(nuevot)
     nodo = random.randint(1,N)
-    grado = random.randint(1,H)
+    grado = random.randint(1,H-1) #El -1 es porque los grados serían del 1 al 6
     print("Nodo: {nodo}".format(nodo=nodo))
     print("Grado: {grado}".format(grado=grado))
     if nodos[grado-1][nodo-1] < 15:
