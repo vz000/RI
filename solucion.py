@@ -12,8 +12,8 @@ durACK = 11e-3
 durDATA = 43e-3
 sigma = 1e-3 #tamaño de miniranuras
 H = 7 #grados
-paquetes_descartados = [0 for h in range(1,H)] #paquetes descartados por grado
-paquetes_generados = [0 for h in range(1,H)] #paquetes generados por grado
+paquetes_descartados = [0 for h in range(H)] #paquetes descartados por grado
+paquetes_generados = [0 for h in range(H)] #paquetes generados por grado
 K = 15 #tamaño del buffer
 sleep = 18 #número de ranuras dormir
 #nodos_por_grado = [5,10,15,20]
@@ -30,7 +30,7 @@ def proceso_gen_paquetes(N,W,lambdda,nodos):
     nuevot = -(1/lambda2)*math.log(1-U)
     print(nuevot)
     nodo = random.randint(1,N)
-    grado = random.randint(1,H-1) #El -1 es porque los grados serían del 1 al 6
+    grado = random.randint(1,H)
     print("Nodo: {nodo}".format(nodo=nodo))
     print("Grado: {grado}".format(grado=grado))
     if nodos[grado-1][nodo-1] < 15:
