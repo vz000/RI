@@ -3,6 +3,7 @@
 from pprint import pprint
 import random
 import math
+import numpy as np
 ## DECLARACIÓN DE VALORES ###
 DIFS = 10e-3
 SIFS = 5e-3
@@ -87,7 +88,8 @@ def inicializacion(N,W,lambdda):
     pprint(nodos)
     ta = -1
     tsim = 0
-    for t1 in range(1, 5000*ranuras_totales):
+    # Basado en tiempo
+    for t1 in np.arange(.1, 5000*round(Tc,1), .1):
         if ta < tsim:
             ta = tsim + proceso_gen_paquetes(N,W,lambdda,nodos)
             pprint(nodos)
@@ -95,7 +97,7 @@ def inicializacion(N,W,lambdda):
         tsim = tsim + T
         
         # Comprobar que se encuentre en Tx
-        if t1 % ranuras_totales == 1:
+        if t1 % round(Tc,1) == 1:
             proceso_transmision(nodos, W, N)
             
 
