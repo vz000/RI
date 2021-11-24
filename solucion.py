@@ -18,6 +18,7 @@ H = 7 #grados
 paquetes_descartados_buffer = [0 for h in range(H)] #paquetes descartados por grado
 paquetes_descartados_colision = [0 for h in range(H)] #paquetes descartados por grado
 paquetes_generados = [0 for h in range(H)] #paquetes generados por grado
+paquetes_nodo_sink = [0] # Paquetes que llegan al nodo sink
 K = 15 #tamaño del buffer
 sleep = 18 #número de ranuras dormir
 #nodos_por_grado = [5,10,15,20]
@@ -28,8 +29,6 @@ windows_size = [16]
 lambda1 = [0.0005]
 # Ciclos 300000
 ciclos = 5000
-# Paquetes que llegan al nodo sink
-paquetes_nodo_sink = [0]
 
 #PROCESO DE GENERACIÓN DE PAQUETES
 def proceso_gen_paquetes(N,W,lambdda,nodos):
