@@ -4,6 +4,8 @@ from pprint import pprint
 import random
 import math
 import numpy as np
+import matplotlib.pyplot as plt
+
 ## DECLARACIÓN DE VALORES ###
 DIFS = 10e-3
 SIFS = 5e-3
@@ -13,7 +15,8 @@ durACK = 11e-3
 durDATA = 43e-3
 sigma = 1e-3 #tamaño de miniranuras
 H = 7 #grados
-paquetes_descartados = [0 for h in range(H)] #paquetes descartados por grado
+paquetes_descartados_buffer = [0 for h in range(H)] #paquetes descartados por grado
+paquetes_descartados_colision = [0 for h in range(H)] #paquetes descartados por grado
 paquetes_generados = [0 for h in range(H)] #paquetes generados por grado
 K = 15 #tamaño del buffer
 sleep = 18 #número de ranuras dormir
@@ -38,12 +41,12 @@ def proceso_gen_paquetes(N,W,lambdda,nodos):
     if nodos[grado-1][nodo-1] < K:
         nodos[grado-1][nodo-1] += 1
     else:
-        paquetes_descartados[grado-1] += 1
+        paquetes_descartados_buffer[grado-1] += 1
     paquetes_generados[grado-1] += 1
     #NUEVO ARRIBO
     return nuevot
 
-def proceso_transmision(nodos, W, N, ciclo):
+def proceso_transmision(nodos, W, N):
     # Grados del mayor al menor
     for grado in range(H,0,-1):
         nodos_contadores = [0 for i in range(N)]
@@ -69,7 +72,7 @@ def proceso_transmision(nodos, W, N, ciclo):
                 for n in nodos_ganadores:
                     nodos[grado-1][n] -= 1
                 # Aumentar paquetes descartados
-                paquetes_descartados[grado-1] += len(nodos_ganadores)
+                paquetes_descartados_colision[grado-1] += len(nodos_ganadores)
             else:
                 # Restar al buffer del nodo
                 nodos[grado-1][nodos_ganadores[0]] -= 1
@@ -81,7 +84,7 @@ def proceso_transmision(nodos, W, N, ciclo):
                         nodos[grado-2][nodos_ganadores[0]] += 1
                     else:
                         # Si no hay espacio en el buffer descartar el paquete
-                        paquetes_descartados[grado-2] += 1
+                        paquetes_descartados_buffer[grado-2] += 1
                 else:
                     # Llegada a nodo sink
                     paquetes_nodo_sink[0] += 1
@@ -96,7 +99,6 @@ def inicializacion(N,W,lambdda):
     
     ta = -1
     tsim = 0
-    i = 0
     # Basado en tiempo
     for t1 in np.arange(.1, ciclos*round(Tc,1)+.1, .1):
         if ta < tsim:
@@ -104,20 +106,37 @@ def inicializacion(N,W,lambdda):
         
         # Comprobar que se encuentre en Tx
         if round(t1 % round(Tc,1), 1) == .1:
-            # Ciclos
-            i += 1
-            proceso_transmision(nodos, W, N, i)
+            proceso_transmision(nodos, W, N)
             
         # incremento de tiempo de simulación
         tsim = tsim + T
     
-    [print(f'Paquetes perdidos grado {a}: {round((b*100)/c,2)}%') for a,b,c in zip(range(1,8), paquetes_descartados, paquetes_generados)]
+    # Gráfica de paquetes perdidos
+    fig, ax = plt.subplots()
     
-    print(f'\nTroughput: {paquetes_nodo_sink[0]}/{ciclos} [paquetes/ciclos]')
+    p1 = ax.bar([x for x in range(H)], paquetes_descartados_colision, .9, label='Por Colisión')
+    p2 = ax.bar([x for x in range(H)], paquetes_descartados_buffer, .9,
+            bottom=paquetes_descartados_colision, label='Por Buffer')
 
+    ax.axhline(0, color='grey', linewidth=0.8)
+    ax.set_ylabel('Paquetes')
+    ax.set_xlabel('Grados')
+    ax.set_title('Paquetes Perdidos')
+    ax.set_xticks([x for x in range(H)])
+    ax.set_xticklabels(['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7'])
+    ax.legend()
+    
+    ax.bar_label(p1, label_type='center')
+    ax.bar_label(p2, label_type='center')
+    ax.bar_label(p2)
+    
+    # Troughput
+    print(f'\nTroughput: {paquetes_nodo_sink[0]}')
+    
 for caso_nodos in nodos_por_grado:
     for caso_W in windows_size:
         for caso_lambda in lambda1:
-            print("Cantidad de nodos: {nodos} \nMáximo número de miniranuras: {W} \nTasa (lambda): {lambdaa}".format(nodos=caso_nodos,W=caso_W,lambdaa=caso_lambda))
+            print("Cantidad de nodos: {nodos} \nMáximo número de miniranuras: {W} \nTasa (lambda): {lambdaa}\n".format(nodos=caso_nodos,W=caso_W,lambdaa=caso_lambda))
             #calculo duración de ranura, esta secuencia se deberá corregir en el diagrama
             inicializacion(caso_nodos,caso_W,caso_lambda)
+            
