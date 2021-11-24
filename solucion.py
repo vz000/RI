@@ -33,11 +33,8 @@ def proceso_gen_paquetes(N,W,lambdda,nodos):
     lambda2 = lambdda * N * H
     U = ((1e6)*random.uniform(0,0.01))/1e6
     nuevot = -(1/lambda2)*math.log(1-U)
-    # print(nuevot)
     nodo = random.randint(1,N)
     grado = random.randint(1,H)
-    # print("Nodo: {nodo}".format(nodo=nodo))
-    # print("Grado: {grado}".format(grado=grado))
     if nodos[grado-1][nodo-1] < K:
         nodos[grado-1][nodo-1] += 1
     else:
@@ -61,11 +58,6 @@ def proceso_transmision(nodos, W, N, ciclo):
         # Determinar el nodo ganador o si es que no hay, poner -1
         minimo = min(nodos_contadores);
         menor_ranura = minimo if minimo < W else -1
-        
-        # print(f'\n Contadores nodos grado {grado}')
-        # pprint(nodos_contadores)
-        
-        # print(f'Menor ranura: {menor_ranura}')
         
         # Si hay paquetes por transmitir
         if menor_ranura > -1:
@@ -101,7 +93,7 @@ def inicializacion(N,W,lambdda):
     ranuras_totales = (2+sleep);
     Tc = ranuras_totales*T
     nodos = [[0 for i in range(N)] for j in range(H)]
-    # pprint(nodos)
+    
     ta = -1
     tsim = 0
     i = 0
@@ -109,9 +101,6 @@ def inicializacion(N,W,lambdda):
     for t1 in np.arange(.1, ciclos*round(Tc,1)+.1, .1):
         if ta < tsim:
             ta = tsim + proceso_gen_paquetes(N,W,lambdda,nodos)
-            # pprint(nodos)
-        # incremento de tiempo de simulación
-        tsim = tsim + T
         
         # Comprobar que se encuentre en Tx
         if round(t1 % round(Tc,1), 1) == .1:
@@ -119,6 +108,12 @@ def inicializacion(N,W,lambdda):
             i += 1
             proceso_transmision(nodos, W, N, i)
             
+        # incremento de tiempo de simulación
+        tsim = tsim + T
+    
+    [print(f'Paquetes perdidos grado {a}: {round((b*100)/c,2)}%') for a,b,c in zip(range(1,8), paquetes_descartados, paquetes_generados)]
+    
+    print(f'\nTroughput: {paquetes_nodo_sink[0]}/{ciclos} [paquetes/ciclos]')
 
 for caso_nodos in nodos_por_grado:
     for caso_W in windows_size:
