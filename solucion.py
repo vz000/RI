@@ -1,6 +1,5 @@
 ########## SIMULACIÓN DE EVENTOS DISCRETOS ##########
 ## al finalizar le programa, eliminar los print() que solo sirvieron para depuración ##
-from pprint import pprint
 import random
 import math
 import numpy as np
@@ -122,7 +121,7 @@ def inicializacion(N,W,lambdda):
     ax.set_xlabel('Grados')
     ax.set_title('Paquetes Perdidos')
     ax.set_xticks([x for x in range(H)])
-    ax.set_xticklabels(['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7'])
+    ax.set_xticklabels([f'G{x}' for x in range(1,H+1)])
     ax.legend()
     
     ax.bar_label(p1, label_type='center')
@@ -130,7 +129,7 @@ def inicializacion(N,W,lambdda):
     ax.bar_label(p2)
     
     # Troughput
-    print(f'\nTroughput: {paquetes_nodo_sink[0]}')
+    print(f'\nTroughput: {paquetes_nodo_sink[0]}/{ciclos} [paquetes/ciclos]')
     
 for caso_nodos in nodos_por_grado:
     for caso_W in windows_size:
