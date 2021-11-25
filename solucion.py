@@ -1,5 +1,4 @@
 ########## SIMULACIÓN DE EVENTOS DISCRETOS ##########
-## al finalizar le programa, eliminar los print() que solo sirvieron para depuración ##
 import random
 import math
 import numpy as np
@@ -29,7 +28,7 @@ windows_size = [16]
 #lambda1 = [0.0005,0.001,0.005,0.03]
 lambda1 = [0.0005]
 # Ciclos 300000
-ciclos = 5000
+ciclos = 300000
 
 #PROCESO DE GENERACIÓN DE PAQUETES
 def proceso_gen_paquetes(N,W,lambdda,nodos):
@@ -123,7 +122,7 @@ def inicializacion(N,W,lambdda):
     ranuras_totales = (2+sleep);
     Tc = ranuras_totales*T
     nodos = [[0 for i in range(N)] for j in range(H)]
-    
+
     ta = -1
     tsim = 0
     # Basado en tiempo
@@ -179,7 +178,7 @@ def inicializacion(N,W,lambdda):
     ax.set_title('Retardos hasta nodo sink')
     ax.bar_label(p1, label_type='center')
     plt.xticks(x_axis,[f'G{x}' for x in range(1,H+1)])
-    
+    plt.show()
     # Troughput
     print(f'\nTroughput: {paquetes_nodo_sink}/{ciclos} [paquetes/ciclos]')
     
@@ -189,4 +188,4 @@ for caso_nodos in nodos_por_grado:
             print("Cantidad de nodos: {nodos} \nMáximo número de miniranuras: {W} \nTasa (lambda): {lambdaa}\n".format(nodos=caso_nodos,W=caso_W,lambdaa=caso_lambda))
             #calculo duración de ranura, esta secuencia se deberá corregir en el diagrama
             inicializacion(caso_nodos,caso_W,caso_lambda)
-            
+
