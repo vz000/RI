@@ -17,7 +17,9 @@ H = 7 #grados
 paquetes_descartados_buffer = [0 for h in range(H)] #paquetes descartados por grado
 paquetes_descartados_colision = [0 for h in range(H)] #paquetes descartados por grado
 paquetes_generados = [0 for h in range(H)] #paquetes generados por grado
-paquetes_nodo_sink = [0] # Paquetes que llegan al nodo sink
+paquetes_nodo_sink = 0 # Paquetes que llegan al nodo sink
+retardos = [0 for h in range(H)]
+retardos2 = [0 for h in range(H)]
 K = 15 #tamaño del buffer
 sleep = 18 #número de ranuras dormir
 #nodos_por_grado = [5,10,15,20]
@@ -45,6 +47,8 @@ def proceso_gen_paquetes(N,W,lambdda,nodos):
     return nuevot
 
 def proceso_transmision(nodos, W, N):
+    global paquetes_nodo_sink
+    retardos2_helper = [0 for h in range(H)]
     # Grados del mayor al menor
     for grado in range(H,0,-1):
         nodos_contadores = [0 for i in range(N)]
@@ -80,13 +84,38 @@ def proceso_transmision(nodos, W, N):
                     if nodos[grado-2][nodos_ganadores[0]] < K:
                         # Si hay espacio en el buffer recibir el paquete
                         nodos[grado-2][nodos_ganadores[0]] += 1
+                        
+                        # Retardos v2
+                        retardos2_helper[grado-1] = 1
+                        
+                        # Paquetes que llegan al nodo
+                        retardos[grado-1] += 1
                     else:
                         # Si no hay espacio en el buffer descartar el paquete
                         paquetes_descartados_buffer[grado-2] += 1
                 else:
                     # Llegada a nodo sink
-                    paquetes_nodo_sink[0] += 1
-                        
+                    paquetes_nodo_sink += 1
+                    
+                    # Paquetes que llegan al nodo
+                    retardos[grado-1] += 1
+                    
+                    # Retardos v2
+                    retardos2_helper[grado-1] = 1
+    
+    # Función para contar retardos
+    contador_retardos(retardos2_helper)
+
+# Contar los retadors
+def contador_retardos(rets):
+    nodo_transmisor = H
+    for i,r in reversed(list(enumerate(rets))):
+        if r == 0:
+            nodo_transmisor = i
+    
+    for i in range(nodo_transmisor):
+        retardos2[i] += 1
+    
 
 #INICIALIZACIÓN DE VARIABLES CORRESPONDIENTES AL CASO
 def inicializacion(N,W,lambdda):
@@ -110,10 +139,11 @@ def inicializacion(N,W,lambdda):
         tsim = tsim + T
     
     # Gráfica de paquetes perdidos
+    x_axis = [x for x in range(H)]
     fig, ax = plt.subplots()
     
-    p1 = ax.bar([x for x in range(H)], paquetes_descartados_colision, .9, label='Por Colisión')
-    p2 = ax.bar([x for x in range(H)], paquetes_descartados_buffer, .9,
+    p1 = ax.bar(x_axis, paquetes_descartados_colision, .9, label='Por Colisión')
+    p2 = ax.bar(x_axis, paquetes_descartados_buffer, .9,
             bottom=paquetes_descartados_colision, label='Por Buffer')
 
     ax.axhline(0, color='grey', linewidth=0.8)
@@ -128,8 +158,30 @@ def inicializacion(N,W,lambdda):
     ax.bar_label(p2, label_type='center')
     ax.bar_label(p2)
     
+    # Gráfica de retardos v1
+    plt.figure()
+    r = [ciclos/x for x in retardos]
+    plt.plot(x_axis, list(reversed(r)), marker='o')
+    for a,b in zip(x_axis, reversed(r)): 
+        plt.text(a, b, str(round(b,2)))
+    plt.title('Retardos entre grados', fontsize=14)
+    plt.xlabel('Grados', fontsize=14)
+    plt.ylabel('Ciclos por paquete', fontsize=14)
+    plt.xticks(x_axis, list(reversed([f'G{x} - G{x-1}' for x in range(1,H+1)])))
+    
+    # Gráfica de retardos v2
+    fig, ax = plt.subplots()
+    r = [ciclos/x for x in retardos2]
+    p1 = ax.bar(x_axis, r, 0.9)
+    ax.set_ylabel('Ciclos por paquete')
+    ax.set_xticks([x for x in range(H)])
+    ax.set_xticklabels([f'G{x}' for x in range(1,H+1)])
+    ax.set_title('Retardos hasta nodo sink')
+    ax.bar_label(p1, label_type='center')
+    plt.xticks(x_axis,[f'G{x}' for x in range(1,H+1)])
+    
     # Troughput
-    print(f'\nTroughput: {paquetes_nodo_sink[0]}/{ciclos} [paquetes/ciclos]')
+    print(f'\nTroughput: {paquetes_nodo_sink}/{ciclos} [paquetes/ciclos]')
     
 for caso_nodos in nodos_por_grado:
     for caso_W in windows_size:
