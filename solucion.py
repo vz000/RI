@@ -19,12 +19,13 @@ paquetes_generados = [0 for h in range(H)] #paquetes generados por grado
 paquetes_nodo_sink = 0 # Paquetes que llegan al nodo sink
 retardos = [0 for h in range(H)]
 retardos2 = [0 for h in range(H)]
+caso = 1
 K = 15 #tamaño del buffer
 sleep = 18 #número de ranuras dormir
 #nodos_por_grado = [5,10,15,20]
 nodos_por_grado = [5]
 #windows_size = [16,32,64,128,256]
-windows_size = [16]
+windows_size = [256]
 #lambda1 = [0.0005,0.001,0.005,0.03]
 lambda1 = [0.0005]
 # Ciclos 300000
@@ -181,11 +182,20 @@ def inicializacion(N,W,lambdda):
     plt.show()
     # Troughput
     print(f'\nTroughput: {paquetes_nodo_sink}/{ciclos} [paquetes/ciclos]')
+    print('\n\n')
     
 for caso_nodos in nodos_por_grado:
     for caso_W in windows_size:
         for caso_lambda in lambda1:
+            print(f' --------- Caso {caso} ---------- ')
+            caso += 1
             print("Cantidad de nodos: {nodos} \nMáximo número de miniranuras: {W} \nTasa (lambda): {lambdaa}\n".format(nodos=caso_nodos,W=caso_W,lambdaa=caso_lambda))
             #calculo duración de ranura, esta secuencia se deberá corregir en el diagrama
             inicializacion(caso_nodos,caso_W,caso_lambda)
+            paquetes_descartados_buffer = [0 for h in range(H)] #paquetes descartados por grado
+            paquetes_descartados_colision = [0 for h in range(H)] #paquetes descartados por grado
+            paquetes_generados = [0 for h in range(H)] #paquetes generados por grado
+            paquetes_nodo_sink = 0 # Paquetes que llegan al nodo sink
+            retardos = [0 for h in range(H)]
+            retardos2 = [0 for h in range(H)]
 
